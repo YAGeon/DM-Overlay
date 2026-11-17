@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src https: data: blob:; font-src 'self'; connect-src 'none'; media-src https: blob: data:; frame-src https://www.youtube.com https://www.youtube-nocookie.com;"
+    />
+    <title>ЛС — Discord / Telegram</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app" class="app">
+      <header class="titlebar" id="titlebar">
+        <div class="brand">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText" class="status-text">Загрузка…</span>
+        </div>
+        <div class="actions">
+          <button class="icon-btn" id="btnPin" title="Поверх всех окон">
+            <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M14.5 2.5 21.5 9.5 19 12l-1.2-.3-3.3 3.3.6 3.1-2.1 2.1-4.6-4.6-4.6 4.6-1.4-1.4 4.6-4.6L2.3 9.6 4.4 7.5l3.1.6L10.8 4.8 10.5 3.6 14.5 2.5z"
+              />
+            </svg>
+          </button>
+          <button class="icon-btn" id="btnSound" title="Звук уведомлений">
+            <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M12 3a4 4 0 0 0-4 4v4.2L6.3 14a1 1 0 0 0 .8 1.6h9.8a1 1 0 0 0 .8-1.6L16 11.2V7a4 4 0 0 0-4-4zm-1.7 14a1.8 1.8 0 0 0 3.4 0h-3.4z"
+              />
+            </svg>
+          </button>
+          <button class="icon-btn" id="btnSettings" title="Настройки">
+            <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5zm9 3.5-.1-1.3 1.5-1.7-1.8-3.1-2.2.5-1.1-.7-.4-2.2h-3.6l-.4 2.2-1.1.7-2.2-.5L7.8 9l1.5 1.7a8 8 0 0 0 0 2.6L7.8 15l1.8 3.1 2.2-.5 1.1.7.4 2.2h3.6l.4-2.2 1.1-.7 2.2.5 1.8-3.1-1.5-1.7.1-1.3z"
+              />
+            </svg>
+          </button>
+          <button class="icon-btn" id="btnMin" title="Свернуть">
+            <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+              <path fill="currentColor" d="M5 11h14v2H5z" />
+            </svg>
+          </button>
+          <button class="icon-btn danger" id="btnClose" title="Скрыть в трей (Ctrl+Shift+D)">
+            <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4z"
+              />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <nav class="tabs" id="tabs">
+        <button class="tab active" type="button" data-source="discord">
+          <span class="dot" id="tabDotDiscord"></span>
+          <span class="tab-name">Discord</span>
+          <span class="badge" id="badgeDiscord" hidden>0</span>
+        </button>
+        <button class="tab" type="button" data-source="telegram">
+          <span class="dot" id="tabDotTelegram"></span>
+          <span class="tab-name">Telegram</span>
+          <span class="badge" id="badgeTelegram" hidden>0</span>
+        </button>
+        <button class="tab" type="button" data-source="music">
+          <span class="dot" id="tabDotMusic"></span>
+          <span class="tab-name">Музыка</span>
+        </button>
+      </nav>
+
+      <div class="chat-head" id="chatHead" hidden>
+        <button class="back-btn" id="chatBack" type="button" title="К списку чатов">
+          <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+            <path fill="currentColor" d="M15.4 4.6 8 12l7.4 7.4 1.4-1.4L10.8 12l6-6z" />
+          </svg>
+        </button>
+        <div class="chat-head-avatar" id="chatHeadAvatar"></div>
+        <div class="chat-head-text">
+          <span class="chat-head-name" id="chatHeadName"></span>
+          <span class="chat-head-sub" id="chatHeadSub">Личные сообщения</span>
+        </div>
+      </div>
+
+      <div class="feed" id="feed">
+        <div class="chats" id="chats"></div>
+        <div class="empty" id="empty">
+          <div class="empty-emoji" id="emptyEmoji">💬</div>
+          <div class="empty-title" id="emptyTitle">Здесь появятся личные сообщения</div>
+          <div class="empty-hint" id="emptyHint">
+            Открой настройки (⚙) и подключи Discord или Telegram.
+          </div>
+          <button class="link-btn" id="emptySettings">Открыть настройки</button>
+        </div>
+      </div>
+
+      <button class="scroll-btn" id="scrollBtn" hidden>↓ новые</button>
+      <button class="new-chat-btn" id="newChatBtn" type="button" title="Написать новому человеку" hidden>
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <path fill="currentColor" d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <span>Новое</span>
+      </button>
+
+      <div class="music" id="music" hidden>
+        <div class="music-top">
+          <input
+            id="musicQuery"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Ссылка YouTube или поиск…"
+          />
+          <button class="btn primary" id="musicGo" type="button">Найти</button>
+        </div>
+
+        <div class="seg music-seg" id="musicSeg">
+          <button type="button" class="seg-btn" data-music-view="lib">Моя музыка</button>
+          <button type="button" class="seg-btn active" data-music-view="reco">Рекомендации</button>
+          <button type="button" class="seg-btn" data-music-view="search">Результаты</button>
+        </div>
+
+        <div class="music-stage" id="musicStage" hidden>
+          <div class="music-stage-head">
+            <span>Плеер YouTube</span>
+            <button type="button" id="musicStageClose" title="Свернуть">×</button>
+          </div>
+          <iframe
+            id="musicFrame"
+            title="Плеер YouTube"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <div class="music-list" id="musicList"></div>
+
+        <div class="music-bar" id="musicBar" hidden>
+          <div class="music-bar-row">
+            <img class="music-cover" id="musicCover" alt="" hidden />
+            <div class="music-meta">
+              <div class="music-title" id="musicTitle">—</div>
+              <div class="music-sub" id="musicSub"></div>
+            </div>
+            <button class="icon-btn" id="musicPrev" title="Предыдущий">
+              <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                <path fill="currentColor" d="M7 6h2v12H7zm3 6 8-6v12z" />
+              </svg>
+            </button>
+            <button class="icon-btn music-play" id="musicPlay" title="Играть / пауза">
+              <svg id="musicPlayIcon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path fill="currentColor" d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+            <button class="icon-btn" id="musicNext" title="Следующий">
+              <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                <path fill="currentColor" d="M15 6h2v12h-2zM6 6l8 6-8 6z" />
+              </svg>
+            </button>
+            <span class="music-time" id="musicTime">0:00</span>
+          </div>
+          <input class="music-seek" id="musicSeek" type="range" min="0" max="1000" value="0" />
+          <div class="music-bar-row music-bar-bottom">
+            <span class="music-mode" id="musicMode">Без рекламы</span>
+            <button class="icon-btn" id="musicVolIcon" title="Громкость">
+              <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M4 9h3l4-4v14l-4-4H4zm11.5-1.4a4 4 0 0 1 0 8.8v-1.6a2.5 2.5 0 0 0 0-5.6zM13 4.6a7 7 0 0 1 0 14.8v-1.7a5.3 5.3 0 0 0 0-11.4z"
+                />
+              </svg>
+            </button>
+            <input class="music-vol" id="musicVol" type="range" min="0" max="100" value="80" />
+          </div>
+        </div>
+      </div>
+
+      <audio id="audio" preload="none"></audio>
+
+      <form class="composer" id="composer">
+        <div class="reply-hint edit-hint" id="editHint" hidden>
+          <span class="reply-hint-icon">✏️</span>
+          <div class="reply-hint-body">
+            <span class="reply-hint-title">Редактирование сообщения</span>
+            <span class="reply-preview" id="editPreview"></span>
+          </div>
+          <button type="button" id="editCancel" title="Отменить">×</button>
+        </div>
+        <div class="reply-hint" id="replyHint" hidden>
+          <span class="reply-hint-icon">↩</span>
+          <div class="reply-hint-body">
+            <span class="reply-hint-title">В ответ <b id="replyName"></b></span>
+            <span class="reply-preview" id="replyPreview"></span>
+          </div>
+          <button type="button" id="replyCancel" title="Отменить">×</button>
+        </div>
+        <div class="composer-row">
+          <input
+            id="input"
+            type="text"
+            maxlength="2000"
+            autocomplete="off"
+            placeholder="Написать сообщение…"
+          />
+          <button
+            type="button"
+            class="icon-btn composer-attach"
+            id="attachBtn"
+            title="Прикрепить файл: фото, документ, mp3, mp4"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M16.9 6.4 8.3 15a2.5 2.5 0 0 0 3.5 3.5l8.6-8.6a4.5 4.5 0 0 0-6.4-6.4L5.5 12a6.5 6.5 0 0 0 9.2 9.2l7.1-7.1-1.4-1.4-7.1 7.1a4.5 4.5 0 0 1-6.4-6.4l8.6-8.6a2.5 2.5 0 0 1 3.5 3.5l-8.6 8.6a.5.5 0 0 1-.7-.7l7.9-7.9-1.3-1.4z"
+              />
+            </svg>
+          </button>
+          <button type="button" class="icon-btn composer-emoji" id="emojiBtn" title="Эмодзи, стикеры и гифки">😊</button>
+          <button type="submit" id="sendBtn" title="Отправить">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path fill="currentColor" d="M3 3l18 9-18 9 4-9-4-9zm5.5 8h6.2L8.9 8.6 6.1 11z" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="picker" id="picker" hidden>
+          <div class="picker-head">
+            <div class="picker-seg" id="pickerSeg">
+              <button type="button" class="picker-seg-btn active" data-picker="emoji">Эмодзи</button>
+              <button type="button" class="picker-seg-btn" data-picker="sticker">Стикеры</button>
+              <button type="button" class="picker-seg-btn" data-picker="gif">GIF</button>
+            </div>
+            <button type="button" class="icon-btn" id="pickerClose" title="Закрыть">×</button>
+          </div>
+          <div class="picker-search">
+            <input id="pickerSearch" type="text" placeholder="Поиск эмодзи…" autocomplete="off" />
+          </div>
+          <div class="picker-body" id="pickerBody"></div>
+        </div>
+      </form>
+
+      <section class="settings" id="settings" aria-hidden="true">
+        <div class="settings-head">
+          <h2>Настройки</h2>
+          <button class="icon-btn" id="settingsClose" title="Закрыть">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4z"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div class="settings-body">
+          <div class="seg" id="settingsSeg">
+            <button type="button" class="seg-btn active" data-settings-source="discord">Discord</button>
+            <button type="button" class="seg-btn" data-settings-source="telegram">Telegram</button>
+          </div>
+
+          <!-- ------------------------------------------------------ Discord -->
+          <div class="source-block" id="blockDiscord">
+            <div class="auth-card">
+              <div class="auth-title">Аккаунт Discord</div>
+              <div class="auth-status" id="authStatusDiscord">Не подключено</div>
+              <label class="field">
+                <span>Токен аккаунта</span>
+                <input id="discordToken" type="password" placeholder="Вставь токен" spellcheck="false" />
+              </label>
+              <div class="row-buttons">
+                <button class="btn primary" id="btnDiscordConnect">Сохранить и подключить</button>
+                <button class="btn ghost" id="btnDiscordLogout">Выйти</button>
+              </div>
+              <details class="howto">
+                <summary>Как получить токен Discord</summary>
+                <ol>
+                  <li>Открой Discord в браузере и войди в аккаунт.</li>
+                  <li>Нажми <b>F12</b> → вкладка <b>Console</b>.</li>
+                  <li>
+                    Вставь:
+                    <code
+                      >(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in
+                      e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void
+                      0).exports.default.getToken()</code
+                    >
+                  </li>
+                  <li>Скопируй строку без кавычек и вставь её сюда.</li>
+                </ol>
+                <p class="warn">
+                  Токен = полный доступ к аккаунту. Никому его не передавай. Вход по токену
+                  нарушает правила Discord — аккаунт могут заблокировать.
+                </p>
+              </details>
+            </div>
+
+            <label class="field">
+              <span>Показывать только от (ник или ID через запятую)</span>
+              <input id="watchDiscord" type="text" placeholder="пусто = все личные сообщения" />
+            </label>
+
+            <div class="switch-list">
+              <label class="switch">
+                <input type="checkbox" id="optDiscordShowOwn" />
+                <span>Показывать мои сообщения</span>
+              </label>
+              <label class="switch">
+                <input type="checkbox" id="optDiscordSend" />
+                <span>Разрешить ответы из окна</span>
+              </label>
+            </div>
+
+            <div class="ignore-block">
+              <div class="ignore-title">Игнорируемые чаты</div>
+              <div class="ignore-list" id="ignoreListDiscord"></div>
+            </div>
+          </div>
+
+          <!-- ----------------------------------------------------- Telegram -->
+          <div class="source-block" id="blockTelegram" hidden>
+            <div class="auth-card">
+              <div class="auth-title">Аккаунт Telegram</div>
+              <div class="auth-status" id="authStatusTelegram">Не подключено</div>
+
+              <div class="switch-list">
+                <label class="switch">
+                  <input type="checkbox" id="optTgBuiltinApi" />
+                  <span>Встроенные данные Telegram — my.telegram.org не нужен</span>
+                </label>
+              </div>
+              <p class="hint" style="margin: 6px 0 12px">
+                По умолчанию вход использует учётные данные официального клиента Telegram:
+                достаточно номера и кода. Выключи, чтобы вписать свои api_id/api_hash.
+              </p>
+
+              <label class="field">
+                <span>api_id</span>
+                <input id="tgApiId" type="text" placeholder="1234567" inputmode="numeric" spellcheck="false" />
+              </label>
+              <label class="field">
+                <span>api_hash</span>
+                <input id="tgApiHash" type="password" placeholder="0123456789abcdef0123456789abcdef" spellcheck="false" />
+              </label>
+              <label class="field">
+                <span>Номер телефона</span>
+                <input id="tgPhone" type="tel" placeholder="+7 999 123-45-67" spellcheck="false" />
+              </label>
+
+              <label class="field">
+                <span>SOCKS5-прокси — если Telegram заблокирован</span>
+                <input
+                  id="tgProxy"
+                  type="text"
+                  placeholder="127.0.0.1:1080"
+                  spellcheck="false"
+                />
+                <small class="hint">Необязательно. Формат: host:port или user:pass@host:port.</small>
+              </label>
+
+              <div class="prompt" id="tgPrompt" hidden>
+                <div class="prompt-title" id="tgPromptTitle">Код из Telegram</div>
+                <div class="prompt-row">
+                  <input id="tgPromptInput" type="text" autocomplete="one-time-code" placeholder="12345" />
+                  <button class="btn primary" id="tgPromptSubmit" type="button">ОК</button>
+                </div>
+                <div class="prompt-hint" id="tgPromptHint">Код придёт в Telegram или по SMS.</div>
+              </div>
+
+              <div class="tg-qr" id="tgQr" hidden>
+                <img id="tgQrImg" alt="QR-код для входа в Telegram" />
+                <div class="tg-qr-hint">
+                  Открой Telegram на телефоне → <b>Настройки → Устройства → Подключить устройство</b>
+                  и наведи камеру на этот код.
+                </div>
+                <button class="btn ghost" id="tgQrCancel" type="button">Отменить вход</button>
+              </div>
+
+              <div class="row-buttons">
+                <button class="btn primary" id="btnTelegramQr">Войти по QR-коду</button>
+                <button class="btn ghost" id="btnTelegramLogin">Войти по коду</button>
+              </div>
+              <div class="row-buttons">
+                <button class="btn ghost" id="btnTelegramLogout">Выйти</button>
+              </div>
+
+              <details class="howto">
+                <summary>Свои api_id и api_hash (если выключены встроенные)</summary>
+                <ol>
+                  <li>Зайди на <b>my.telegram.org</b> и войди по номеру телефона.</li>
+                  <li>Открой <b>API development tools</b>.</li>
+                  <li>Заполни название (любое) и платформу, нажми Create application.</li>
+                  <li>Скопируй <b>App api_id</b> и <b>App api_hash</b> сюда.</li>
+                </ol>
+                <p class="hint">
+                  <b>Проще всего — «Войти по QR-коду»:</b> отсканируй код в приложении Telegram,
+                  и вход произойдёт без всяких кодов.
+                </p>
+                <p class="hint">
+                  При входе по коду Telegram со встроенными данными отправляет код
+                  <b>в приложение Telegram</b> (на телефон или другое устройство), а не по SMS.
+                  Если код не приходит — используй вход по QR-коду.
+                  При двухфакторной защите дополнительно спросим пароль.
+                </p>
+                <p class="hint">
+                  Если Telegram в твоей сети заблокирован, укажи SOCKS5-прокси или включи VPN —
+                  без этого соединение не установится.
+                </p>
+              </details>
+            </div>
+
+            <label class="field">
+              <span>Показывать только от (имя, @ник или ID через запятую)</span>
+              <input id="watchTelegram" type="text" placeholder="пусто = все личные сообщения" />
+            </label>
+
+            <div class="switch-list">
+              <label class="switch">
+                <input type="checkbox" id="optTelegramShowOwn" />
+                <span>Показывать мои сообщения</span>
+              </label>
+              <label class="switch">
+                <input type="checkbox" id="optTelegramSend" />
+                <span>Разрешить ответы из окна</span>
+              </label>
+            </div>
+
+            <div class="ignore-block">
+              <div class="ignore-title">Игнорируемые чаты</div>
+              <div class="ignore-list" id="ignoreListTelegram"></div>
+            </div>
+          </div>
+
+          <!-- ------------------------------------------------------ общее -->
+          <div class="divider"><span>Общие настройки</span></div>
+
+          <div class="switch-list">
+            <label class="switch">
+              <input type="checkbox" id="optNotify" />
+              <span>Уведомления Windows, когда окно скрыто</span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="optSound" />
+              <span>Звук при новом сообщении</span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="optTop" />
+              <span>Поверх всех окон</span>
+            </label>
+          </div>
+
+          <label class="field slider">
+            <span>Прозрачность окна <b id="opacityVal"></b></span>
+            <input id="opacityRange" type="range" min="35" max="100" step="1" />
+          </label>
+
+          <label class="field slider">
+            <span>Размер текста <b id="fontVal"></b></span>
+            <input id="fontRange" type="range" min="11" max="20" step="1" />
+          </label>
+
+          <div class="row-buttons">
+            <button class="btn ghost" id="btnTest">Тестовое сообщение</button>
+            <button class="btn ghost" id="btnClear">Очистить историю</button>
+          </div>
+          <div class="row-buttons">
+            <button class="btn ghost" id="btnFolder">Папка с данными</button>
+            <button class="btn ghost" id="btnReload">Переподключиться</button>
+          </div>
+          <div class="row-buttons">
+            <button class="btn ghost" id="btnYtdlp">Обновить yt-dlp (музыка)</button>
+          </div>
+
+          <p class="meta" id="meta"></p>
+        </div>
+      </section>
+
+      <div class="modal" id="newChat" hidden>
+        <div class="modal-card">
+          <div class="modal-head">
+            <span class="modal-title" id="newChatTitle">Новое сообщение</span>
+            <button class="icon-btn" id="newChatClose" type="button" title="Закрыть">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4z"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <label class="field">
+              <span id="newChatSearchLabel">Найти среди друзей</span>
+              <div class="prompt-row">
+                <input id="newChatQuery" type="text" placeholder="Имя или @ник" spellcheck="false" />
+                <button class="btn primary" id="newChatSearch" type="button">Найти</button>
+              </div>
+              <small class="hint" id="newChatSearchHint">Ищет по списку друзей Discord и по тем, с кем уже есть переписка.</small>
+            </label>
+
+            <label class="field">
+              <span id="newChatIdLabel">Или вставь ID пользователя</span>
+              <div class="prompt-row">
+                <input id="newChatId" type="text" placeholder="000000000000000000" spellcheck="false" />
+                <button class="btn ghost" id="newChatOpenId" type="button">Открыть</button>
+              </div>
+              <small class="hint" id="newChatIdHint">
+                Подходит для любого человека, даже не из друзей. Discord → Настройки → Дополнительно → Режим разработчика, затем ПКМ по человеку → «Копировать ID».
+              </small>
+            </label>
+
+            <div class="modal-status" id="newChatStatus" hidden></div>
+            <div class="new-chat-results" id="newChatResults"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal" id="forwardModal" hidden>
+        <div class="modal-card">
+          <div class="modal-head">
+            <span class="modal-title">Переслать сообщение</span>
+            <button class="icon-btn" id="forwardClose" type="button" title="Закрыть">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4z"
+                />
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="forward-preview" id="forwardPreview"></div>
+            <label class="field">
+              <span>Кому переслать</span>
+              <input id="forwardQuery" type="text" placeholder="Поиск по чатам…" autocomplete="off" />
+            </label>
+            <div class="forward-tabs" id="forwardTabs">
+              <button class="forward-tab" type="button" data-src="discord">Discord</button>
+              <button class="forward-tab" type="button" data-src="telegram">Telegram</button>
+            </div>
+            <div class="forward-list" id="forwardList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lightbox" id="lightbox" hidden>
+        <button class="lightbox-close" id="lightboxClose" title="Закрыть">×</button>
+        <div class="lightbox-body" id="lightboxBody"></div>
+      </div>
+
+      <div class="toast" id="toast" hidden></div>
+    </div>
+
+    <script src="vendor/qrcode.js"></script>
+    <script src="renderer.js"></script>
+  </body>
+</html>

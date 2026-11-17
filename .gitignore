@@ -1,0 +1,12 @@
+node_modules/
+npm-debug.log*
+*.log
+dist/
+out/
+release/
+
+# Local shortcuts / OS junk (may contain absolute paths)
+*.lnk
+Thumbs.db
+desktop.ini
+.DS_Store

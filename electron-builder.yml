@@ -1,0 +1,67 @@
+# Сборка установщика (NSIS) для Windows.
+#
+#   npm run installer
+#
+# Результат: release/DM-Overlay-Setup-<версия>.exe
+#
+# productName намеренно задан только здесь (не в package.json): папка данных
+# приложения (%APPDATA%\discord-dm-overlay) должна совпадать у portable- и
+# установленной версии, чтобы настройки и сессии не терялись.
+
+appId: com.dmoverlay.app
+productName: DM Overlay
+copyright: DM Overlay
+
+directories:
+  output: release
+
+# Нативные модули не пересобираем: ws прекрасно работает и без опциональных
+# bufferutil / utf-8-validate.
+npmRebuild: false
+buildDependenciesFromSource: false
+
+# Максимальное сжатие — инсталлятор получается заметно меньше.
+compression: maximum
+
+# Из пакета выкидываем всё, что нужно только для разработки.
+files:
+  - "!dist/**"
+  - "!release/**"
+  - "!scripts/**"
+  - "!.git/**"
+  - "!*.bat"
+  - "!*.lnk"
+  - "!README.md"
+  - "!electron-builder.yml"
+  - "!package-lock.json"
+
+# Файлы приложения упаковываем в один архив — быстрее запуск, меньше файлов.
+asar: true
+# yt-dlp.exe нельзя запускать из asar — держим его распакованным.
+asarUnpack:
+  - "bin/**"
+
+win:
+  icon: assets/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+
+nsis:
+  # Обычный мастер установки с выбором папки (не «одним кликом»).
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: DM Overlay
+  uninstallDisplayName: DM Overlay
+  # Удаляем данные приложения (в т.ч. %APPDATA%\discord-dm-overlay) при удалении.
+  deleteAppDataOnUninstall: true
+  # Дополнительная логика: предложение удалить приложение при повторном запуске
+  # установщика и гарантированная чистка данных.
+  include: scripts/installer.nsh
+  installerIcon: assets/icon.ico
+  uninstallerIcon: assets/icon.ico
+  artifactName: DM-Overlay-Setup-${version}.exe

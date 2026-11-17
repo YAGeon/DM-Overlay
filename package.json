@@ -1,0 +1,27 @@
+{
+  "name": "discord-dm-overlay",
+  "version": "1.11.0",
+  "private": true,
+  "description": "Мини-окно на экране ПК с личными сообщениями Discord и Telegram",
+  "author": "DM Overlay",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "icon": "node scripts/make-icon.js",
+    "build": "node scripts/build.js",
+    "installer": "electron-builder --win nsis",
+    "dist": "node scripts/build.js && electron-builder --win nsis"
+  },
+  "dependencies": {
+    "telegram": "^2.26.22",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@electron/packager": "^18.4.4",
+    "electron": "^33.2.0",
+    "electron-builder": "^26.18.0"
+  },
+  "allowScripts": {
+    "electron@33.4.11": true
+  }
+}
